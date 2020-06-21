@@ -6,23 +6,31 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.raywenderlich.android.creaturemon.R
+import com.raywenderlich.android.creaturemon.presenter.AllCreatureContract
+import com.raywenderlich.android.creaturemon.presenter.AllCreaturePresenter
 import com.raywenderlich.android.creaturemon.view.creature.CreatureActivity
 import kotlinx.android.synthetic.main.activity_all_creatures.*
 import kotlinx.android.synthetic.main.content_all_creatures.*
 
-class AllCreaturesActivity : AppCompatActivity() {
+class AllCreaturesActivity : AppCompatActivity(), AllCreatureContract.View {
 
   private val adapter = CreatureAdapter(mutableListOf())
-
+  private val presenter = AllCreaturePresenter()
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_all_creatures)
     setSupportActionBar(toolbar)
-
+    presenter.setView(this)
     creaturesRecyclerView.layoutManager = LinearLayoutManager(this)
     creaturesRecyclerView.adapter = adapter
-
+    presenter.getAllCreatures().observe(this, Observer {
+      it?.let { creatureList ->
+        adapter.updateCreatures(creatureList)
+      }
+    })
     fab.setOnClickListener {
       startActivity(Intent(this, CreatureActivity::class.java))
     }
@@ -37,9 +45,14 @@ class AllCreaturesActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.action_clear_all -> {
+        presenter.clearAllCreatures()
         true
       }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  override fun showCreatureCleared() {
+    Toast.makeText(this,getString(R.string.creature_empty),Toast.LENGTH_SHORT).show()
   }
 }

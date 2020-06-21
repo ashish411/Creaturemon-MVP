@@ -8,8 +8,10 @@ import com.raywenderlich.android.creaturemon.model.AttributeType.STRENGTH
 import com.raywenderlich.android.creaturemon.model.Creature
 import com.raywenderlich.android.creaturemon.model.CreatureAttributes
 import com.raywenderlich.android.creaturemon.model.CreatureGenerator
+import com.raywenderlich.android.creaturemon.model.room.RoomRepository
 
-class CreaturePresenter(private val creatureGenerator: CreatureGenerator = CreatureGenerator()) :
+class CreaturePresenter(private val creatureGenerator: CreatureGenerator = CreatureGenerator(),
+    private val repository: RoomRepository = RoomRepository()) :
     BasePresenter<CreatureContract.View>(), CreatureContract.Presenter {
 
     private lateinit var creature: Creature
@@ -44,11 +46,23 @@ class CreaturePresenter(private val creatureGenerator: CreatureGenerator = Creat
         return drawable != 0
     }
 
+    override fun saveCreature() {
+        if (canSaveCreature()) {
+            repository.saveCreature(creature)
+            getView()?.showCreatureSaved()
+        } else {
+            getView()?.showCreatureSavedError()
+        }
+    }
+
     private fun updateCreature() {
         val attributes = CreatureAttributes(intelligence, strength, endurance)
         creature = creatureGenerator.generateCreature(attributes, name, drawable)
         getView()?.showHitPoints(creature.hitPoints.toString())
     }
 
+    private fun canSaveCreature(): Boolean{
+        return intelligence!=0 && endurance!=0 && strength!=0 && name.isNotEmpty() && drawable!=0
+    }
 
 }
