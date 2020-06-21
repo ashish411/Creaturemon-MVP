@@ -30,7 +30,22 @@
 
 package com.raywenderlich.android.creaturemon.model.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.raywenderlich.android.creaturemon.model.Creature
 
 @Dao
-interface CreatureDao
+interface CreatureDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(creature: Creature)
+
+    @Delete
+    fun clearCreature(vararg creature: Creature)
+
+    @Query("SELECT * FROM creature_table ORDER BY name ASC")
+    fun getAllCreatures(): LiveData<List<Creature>>
+}
