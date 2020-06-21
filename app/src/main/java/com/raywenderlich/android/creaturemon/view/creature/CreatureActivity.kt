@@ -36,6 +36,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.raywenderlich.android.creaturemon.R
 import com.raywenderlich.android.creaturemon.model.AttributeStore
@@ -124,7 +125,7 @@ class CreatureActivity : AppCompatActivity(), AvatarAdapter.AvatarListener, Crea
         }
 
         saveButton.setOnClickListener {
-            // TODO: handle save button clicked
+            presenter.saveCreature()
         }
     }
 
@@ -143,5 +144,14 @@ class CreatureActivity : AppCompatActivity(), AvatarAdapter.AvatarListener, Crea
 
     override fun showAvatarDrawable(resourceId: Int) {
         avatarImageView.setImageResource(resourceId)
+    }
+
+    override fun showCreatureSaved() {
+        Toast.makeText(this,getString(R.string.creature_saved),Toast.LENGTH_SHORT).show()
+        finish()
+    }
+
+    override fun showCreatureSavedError() {
+        Toast.makeText(this,getString(R.string.error_saving_creature),Toast.LENGTH_SHORT).show()
     }
 }
